@@ -8,6 +8,7 @@ import TVGuide from "./components/TVGuide";
 /**
  * Main application root for the Sports TV Guide chatbot.
  * Arranges layout: Header, Sidebar, ChatWindow, TVGuide.
+ * Top-level ARIA roles and main regions applied.
  */
 // PUBLIC_INTERFACE
 function App() {
@@ -30,12 +31,14 @@ function App() {
         className="theme-toggle"
         onClick={toggleTheme}
         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+        tabIndex={0}
+        title={`Switch to ${theme === "light" ? "dark" : "light"} color theme (keyboard shortcut available from Settings)`}
       >
         {theme === "light" ? "🌙 Dark" : "☀️ Light"}
       </button>
-      <div className="main-layout">
+      <div className="main-layout" role="main">
         <Sidebar />
-        <main className="content-area">
+        <main className="content-area" aria-label="Chat content area" tabIndex={-1}>
           <ChatWindow />
         </main>
         <TVGuide />
