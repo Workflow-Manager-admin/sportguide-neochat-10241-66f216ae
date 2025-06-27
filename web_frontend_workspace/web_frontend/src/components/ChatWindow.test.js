@@ -52,17 +52,17 @@ describe('ChatWindow', () => {
     advanceTimers(3000); // Ensure async behavior and streaming are completed
 
     // Bot reply (mocked) should eventually be shown (partial match ok)
+    // Wait for the FULL STREAMED message that includes both fragments to appear
     await waitFor(() => {
-      // Custom matcher: look for a message that includes both 'Lakers vs. Celtics' and 'ESPN'
       expect(
-        screen.getAllByText((content, node) => {
-          const hasText = (node) =>
-            node.textContent &&
-            node.textContent.includes('Lakers vs. Celtics') &&
-            node.textContent.includes('ESPN');
-          return hasText(node);
-        }).length
-      ).toBeGreaterThan(0);
+        screen.getByText((content, node) => {
+          const text = node && node.textContent;
+          return (
+            text &&
+            text.includes("Tonight at 8PM: Lakers vs. Celtics on ESPN") // Must match full, final bot reply
+          );
+        })
+      ).toBeInTheDocument();
     });
   });
 
