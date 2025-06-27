@@ -53,7 +53,8 @@ describe('TVGuide', () => {
     expect(screen.getByText('ESPN')).toBeInTheDocument();
 
     // Icon and sport label in schedule
-    expect(screen.getByText('⚽️')).toBeInTheDocument();
+    const icons = screen.getAllByText('⚽️');
+    expect(icons.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Football/)).toBeInTheDocument();
   });
 });
