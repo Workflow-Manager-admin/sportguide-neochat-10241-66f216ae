@@ -1,24 +1,51 @@
 /* CSS Variables for Theme Management */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
+  /* Brand theme colors */
+  --primary: #1e3a8a;
+  --secondary: #10b981;
+  --accent: #f59e42;
+  --bg-primary: #fff;
+  --bg-secondary: #f6f7fa;
+  --text-primary: #20242e;
+  --text-secondary: #46507a;
+  --border-color: #e0e7ef;
+  --button-bg: var(--primary);
   --button-text: #ffffff;
+  --sidebar-bg: #f3f4f6;
+  --sidebar-active-bg: #e7eefc;
+  --sidebar-item: var(--primary);
+  --sidebar-active: #fff;
+  --chat-bot-bg: #eaf3fc;
+  --chat-bot-color: var(--primary);
+  --chat-user-bg: #fff9f3;
+  --chat-user-color: var(--accent);
+  --content-area-bg: #fff;
+  --tv-guide-bg: #f8fafc;
+  --tv-guide-header-bg: #eff9f1;
+  --tv-guide-league-color: var(--secondary);
 }
 
 [data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+  /* Brand-aligned dark theme */
+  --bg-primary: #141826;
+  --bg-secondary: #20242e;
+  --text-primary: #f4f7fe;
+  --text-secondary: #89b4e5;
+  --border-color: #232849;
+  --button-bg: var(--primary);
+  --button-text: #fff;
+  --sidebar-bg: #181b29;
+  --sidebar-active-bg: #202c44;
+  --sidebar-item: #dbeafe;
+  --sidebar-active: var(--primary);
+  --chat-bot-bg: #22316a;
+  --chat-bot-color: #7dd3fc;
+  --chat-user-bg: #29233a;
+  --chat-user-color: #f59e42;
+  --content-area-bg: #181b29;
+  --tv-guide-bg: #171a27;
+  --tv-guide-header-bg: #17221a;
+  --tv-guide-league-color: #34d399;
 }
 
 .App {
@@ -34,17 +61,23 @@
   width: 100%;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-  padding: 18px 0 10px 0;
+  box-shadow: 0 1px 12px rgba(30,58,138,0.03);
+  padding: 16px 0 10px 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 56px;
 }
-
 .header-title {
   margin: 0;
-  font-size: 2rem;
-  color: var(--primary, #1e3a8a);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--primary);
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .main-layout {
@@ -56,46 +89,55 @@
 }
 
 .sidebar {
-  background: #f3f4f6;
+  background: var(--sidebar-bg);
   border-right: 1px solid var(--border-color);
-  min-width: 180px;
+  min-width: 168px;
   max-width: 200px;
-  padding: 30px 0 0 0;
+  padding: 32px 0 0 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
+  box-sizing: border-box;
 }
-
 .sidebar ul {
   list-style: none;
-  padding: 0 0 0 25px;
+  padding: 0 0 0 16px;
   margin: 0;
   width: 100%;
 }
 .sidebar-item {
-  font-size: 1.1rem;
-  padding: 10px 0;
-  color: var(--primary, #1e3a8a);
+  font-size: 1.08rem;
+  padding: 10px 16px 10px 6px;
+  color: var(--sidebar-item);
+  background: transparent;
   cursor: pointer;
-  transition: background 0.2s;
-  width: 100%;
+  transition: background 0.19s;
+  border-radius: 6px 20px 20px 6px;
+  font-weight: 500;
+  border: none;
+  width: calc(100% - 6px);
+  margin-bottom: 2px;
 }
 .sidebar-item.active,
 .sidebar-item:hover {
-  background: #e7eefc;
-  font-weight: 600;
+  background: var(--sidebar-active-bg);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.03);
 }
+
 
 .content-area {
   flex: 2;
-  padding: 38px 26px 22px 26px;
-  background: var(--bg-primary);
+  padding: 40px 26px 24px 26px;
+  background: var(--content-area-bg);
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   border-right: 1px solid var(--border-color);
   height: 100%;
+  transition: background 0.3s;
 }
 
 .chat-window {
@@ -103,87 +145,116 @@
   flex-direction: column;
   min-height: 54vh;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 13px;
   background: #f7fafc;
-  box-shadow: 0 1px 6px rgba(30,58,138,0.06);
+  box-shadow: 0 2px 10px rgba(30,58,138,0.05);
   padding: 0;
   position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
 }
 
 .chat-header {
   padding: 16px 25px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f0f6ff;
-  font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--primary, #1e3a8a);
-  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid var(--border-color);
+  background: #f8fafd;
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--primary);
+  border-radius: 13px 13px 0 0;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
 }
 
 .chat-messages {
   flex: 1;
-  padding: 18px 25px;
+  padding: 18px 18px 13px 20px;
   overflow-y: auto;
   background: transparent;
   font-size: 1rem;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
 }
 
 .chat-input-bar {
   display: flex;
-  padding: 12px 18px;
-  border-top: 1px solid #e2e8f0;
-  background: #f5fafd;
-  border-radius: 0 0 12px 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-color);
+  background: #f9fafb;
+  border-radius: 0 0 13px 13px;
+  gap: 9px;
 }
 
 .chat-input {
   flex: 1;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 10px 14px;
-  font-size: 1rem;
-  margin-right: 10px;
+  border-radius: 7px;
+  padding: 9px 13px;
+  font-size: 1em;
+  margin-right: 0;
+  outline: none;
+  background: #fff;
+  transition: border 0.2s;
+}
+
+.chat-input:focus {
+  border: 1.5px solid var(--primary);
 }
 
 .chat-send {
   border: none;
-  background: var(--primary, #1e3a8a);
+  background: var(--primary);
   color: #fff;
   padding: 0 22px;
-  border-radius: 6px;
-  font-size: 1rem;
+  border-radius: 7px;
+  font-size: 1em;
   font-weight: 600;
+  cursor: pointer;
+  opacity: 1;
+  box-shadow: none;
+  transition: background 0.18s, opacity 0.18s;
+  letter-spacing: 0.03em;
+}
+
+.chat-send:disabled,
+.chat-send[disabled] {
+  background: #b3bcdb;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .tv-guide {
-  background: #f9fafb;
-  min-width: 220px;
-  max-width: 270px;
+  background: var(--tv-guide-bg);
+  min-width: 200px;
+  max-width: 295px;
   border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 0;
+  transition: background 0.3s;
 }
-
 .tv-guide-header {
-  padding: 18px 20px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #eff9f1;
-  color: var(--secondary, #10b981);
-  font-size: 1.15rem;
-  font-weight: 600;
+  padding: 15px 16px 15px 22px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--tv-guide-header-bg);
+  color: var(--tv-guide-league-color);
+  font-size: 1.08rem;
+  font-weight: 800;
   border-radius: 0 0 0 0;
+  letter-spacing: 0.01em;
 }
-
 .tv-guide-content {
-  padding: 16px 22px;
+  padding: 14px 7px 12px 7px;
   font-size: 0.98rem;
   text-align: left;
   color: var(--text-primary);
+  background: transparent;
+  width: 100%;
 }
 
 /* Responsive design for mobile */
@@ -191,17 +262,27 @@
   .main-layout {
     flex-direction: column;
     min-height: unset;
+    width: 100vw;
   }
-  .sidebar, .tv-guide {
+  .sidebar,
+  .tv-guide {
     min-width: unset;
     max-width: unset;
-    width: 100%;
+    width: 100vw;
     border: none;
-    padding: 16px 0;
+    padding: 12px 0;
+    border-radius: 0;
+    box-shadow: none;
   }
   .content-area {
     border: none;
-    padding: 10px 10px;
+    padding: 9px 4vw 14px 4vw;
+    background: var(--bg-primary);
+  }
+  .tv-guide-header {
+    border-radius: 0;
+    padding-left: 14px;
+    padding-right: 8px;
   }
 }
 
@@ -236,28 +317,29 @@
 
 .theme-toggle {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
+  top: 22px;
+  right: 22px;
+  background-color: var(--accent);
+  color: #1e293b;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 18px;
+  padding: 8px 18px 8px 18px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: color 0.22s, background 0.22s;
+  box-shadow: 0 2px 10px rgba(245,158,66,0.1);
+  z-index: 20;
+  outline: none;
 }
-
 .theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+  background: var(--primary);
+  color: #fff;
+  opacity: 0.95;
 }
-
 .theme-toggle:active {
-  transform: translateY(0);
+  background: var(--accent);
+  color: #1e293b;
 }
 
 @keyframes App-logo-spin {
@@ -273,8 +355,38 @@
 @media (max-width: 768px) {
   .theme-toggle {
     top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
+    right: 9px;
+    padding: 7px 14px;
+    font-size: 12.5px;
   }
+}
+/* Minimal table override for TV Guide */
+.tv-guide table th, .tv-guide table td {
+  border: none;
+  font-family: inherit;
+}
+.tv-guide table th {
+  background: var(--tv-guide-header-bg);
+  color: var(--primary);
+}
+.tv-guide table td {
+  background: #fff;
+  color: var(--text-primary);
+}
+[data-theme="dark"] .tv-guide table th {
+  background: #23252e;
+  color: var(--tv-guide-league-color);
+}
+[data-theme="dark"] .tv-guide table td {
+  background: #1a1c23;
+  color: var(--text-primary);
+}
+/* Minimal chat bubble style */
+.chat-message.bot-message {
+  background: var(--chat-bot-bg) !important;
+  color: var(--chat-bot-color) !important;
+}
+.chat-message.user-message {
+  background: var(--chat-user-bg) !important;
+  color: var(--chat-user-color) !important;
 }

@@ -97,20 +97,19 @@ function ChatWindow() {
         key={msg.id}
         className={`chat-message ${isBot ? "bot-message" : "user-message"}`}
         style={{
-          background: isBot ? "#eaf3fc" : "#fbeedb",
-          color: isBot ? "#1e3a8a" : "#f59e42",
           alignSelf: isBot ? "flex-start" : "flex-end",
-          borderRadius: isBot ? "12px 12px 12px 4px" : "12px 12px 4px 12px",
-          padding: "8px 12px",
-          marginBottom: 9,
-          maxWidth: "85%",
+          borderRadius: isBot
+            ? "13px 13px 13px 5.5px"
+            : "13px 13px 5.5px 13px",
+          padding: "9px 14px",
+          marginBottom: 7,
+          maxWidth: "84%",
           fontSize: "1.03em",
-          fontWeight: "500",
+          fontWeight: 500,
           letterSpacing: "0.02em",
-          boxShadow:
-            isBot
-              ? "0 1px 3px rgba(30,58,138,0.09)"
-              : "0 1px 3px rgba(245,158,66,0.10)",
+          boxShadow: isBot
+            ? "0 1px 4px rgba(30,58,138,0.07)"
+            : "0 1px 4px rgba(245,158,66,0.10)",
         }}
       >
         {msg.text}
@@ -124,12 +123,10 @@ function ChatWindow() {
       <div
         className="chat-message bot-message"
         style={{
-          background: "#eaf3fc",
-          color: "#1e3a8a",
           alignSelf: "flex-start",
-          borderRadius: "12px 12px 12px 4px",
-          padding: "8px 12px",
-          marginBottom: 8,
+          borderRadius: "13px 13px 13px 5.5px",
+          padding: "9px 14px",
+          marginBottom: 7,
           display: "flex",
           alignItems: "center",
           fontWeight: 500,

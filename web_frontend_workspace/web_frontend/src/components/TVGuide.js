@@ -90,32 +90,32 @@ function TVGuide() {
                       style={{
                         marginLeft: 8,
                         fontSize: "0.96em",
-                        color: "#bbb",
+                        color: "var(--text-secondary)",
                         fontWeight: 500,
                       }}
                     >
                       {sportIcon(game.sport)}{" "}
-                      <span style={{ color: "#222", opacity: 0.65 }}>
+                      <span style={{ color: "var(--text-primary)", opacity: 0.70 }}>
                         {game.sport}
                       </span>
                     </span>
                   </td>
                   <td style={tdStyle}>
-                    <span style={{ color: "#10b981", fontWeight: 600 }}>
+                    <span style={{ color: "var(--tv-guide-league-color)", fontWeight: 600 }}>
                       {game.league}
                     </span>
                   </td>
                   <td style={tdStyle}>
                     <span
                       style={{
-                        background: "#eaf3fc",
-                        color: "#1e3a8a",
+                        background: "var(--chat-bot-bg)",
+                        color: "var(--primary)",
                         borderRadius: 6,
                         fontSize: "0.97em",
                         padding: "2px 10px",
                         fontWeight: 500,
                         letterSpacing: "0.01em",
-                        border: "1px solid #e6edf4",
+                        border: "1px solid var(--border-color)",
                       }}
                     >
                       {game.channel}
