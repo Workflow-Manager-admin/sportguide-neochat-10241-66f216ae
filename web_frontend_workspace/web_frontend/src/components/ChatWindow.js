@@ -4,20 +4,20 @@ import React, { useState, useRef, useEffect } from "react";
  * ChatWindow - Main chat interface for conversation with the Sports TV Guide chatbot.
  * Features:
  *  - Message list, input field, send button.
- *  - Loading indicator and visual feedback when sending.
- *  - Mocked assistant response with simulated delay for demo purposes.
+ *  - Streams assistant messages one character at a time for more natural chat.
+ *  - Smart loading indicator/typing simulation (dot animation).
  *  - Scrolls to newest message automatically.
+ *  - Robust error and input handling.
  */
 /**
  * Simulate backend chat interaction using dummy async function.
- * Replace this with a real fetch (e.g., to FastAPI+Neo4j) once endpoint/keys are available.
+ * Replace this with a real fetch (e.g., to FastAPI+Neo4j).
  */
 // PUBLIC_INTERFACE
 async function fetchChatbotResponse(userText) {
   // Simulate async network delay (backend call)
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Demo AI - replace with backend API call integration here (see mockAssistantResponse for logic)
       if (!userText.trim()) {
         resolve("Could you please type your question?");
       } else if (/football|soccer|nba|basketball/i.test(userText)) {
@@ -35,7 +35,6 @@ async function fetchChatbotResponse(userText) {
 
 // PUBLIC_INTERFACE
 function ChatWindow() {
-  // Chat message state
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -46,33 +45,60 @@ function ChatWindow() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
+  const [pendingBotMessage, setPendingBotMessage] = useState(null); // { id, sender, text, timestamp }
   const [error, setError] = useState("");
+  const [showTyping, setShowTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Scroll to latest message effect
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages, loading, streaming, pendingBotMessage]);
 
-  // Deprecated: Simple mock backend "AI" reply (for backward compatibility)
-  function mockAssistantResponse(userText) {
-    // This function is replaced by fetchChatbotResponse (async).
-    // Retained for reference or fallback.
-    if (!userText.trim()) {
-      return "Could you please type your question?";
+  // Streaming/typing effect: if there's a pendingBotMessage (text revealed one char at a time)
+  useEffect(() => {
+    let timeout;
+    if (streaming && pendingBotMessage && typeof pendingBotMessage.fullText === "string") {
+      if (
+        pendingBotMessage.text.length < pendingBotMessage.fullText.length
+      ) {
+        timeout = setTimeout(() => {
+          setPendingBotMessage((prev) => ({
+            ...prev,
+            text:
+              prev.fullText.slice(0, prev.text.length + Math.max(1, Math.round(prev.fullText.length / 25))), // Stream in batches for long texts
+          }));
+        }, pendingBotMessage.fullText.length > 80 ? 14 : 27);
+      } else {
+        // Finished streaming: commit bot message to messages, end streaming
+        setMessages((prev) => [
+          ...prev,
+          {
+            ...pendingBotMessage,
+            text: pendingBotMessage.fullText,
+            timestamp: new Date().getTime(),
+          },
+        ]);
+        setStreaming(false);
+        setPendingBotMessage(null);
+      }
     }
-    if (/football|soccer|nba|basketball/i.test(userText)) {
-      return "Tonight at 8PM: Lakers vs. Celtics on ESPN. ⚽️🏀";
+    return () => clearTimeout(timeout);
+  }, [streaming, pendingBotMessage]);
+
+  // Smart "typing..." indicator (appears right before streaming, not through whole fetch)
+  useEffect(() => {
+    let typingTimeout;
+    if (loading) {
+      setShowTyping(true);
+      // Hide fake typing if response is super quick (<400ms), or fall back with effect below
+      typingTimeout = setTimeout(() => setShowTyping(false), 1900);
+    } else {
+      setShowTyping(false);
     }
-    if (/guide|today|evening/i.test(userText)) {
-      return "Here's today's sports TV guide: 6PM - Baseball on Fox Sports, 8PM - Football on ESPN, 10PM - Tennis on Star Sports.";
-    }
-    if (/hi|hello|hey|who/i.test(userText)) {
-      return "Hello! I'm here to help you find sports TV schedules.";
-    }
-    // Generic answer
-    return "Sorry, I can't answer that yet. Try asking about TV guide times or a sports match!";
-  }
+    return () => clearTimeout(typingTimeout);
+  }, [loading]);
 
   // PUBLIC_INTERFACE
   function handleInputChange(e) {
@@ -83,11 +109,12 @@ function ChatWindow() {
   // PUBLIC_INTERFACE
   async function handleSend(e) {
     e.preventDefault();
-    if (!input.trim()) {
+    if (!input.trim() || loading) {
       setError("Please enter a message.");
       return;
     }
     setError("");
+    setLoading(true);
 
     const userMsg = {
       id: Date.now(),
@@ -97,20 +124,22 @@ function ChatWindow() {
     };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    setLoading(true);
-
-    // Call the stubbed (dummy) async data fetch function for backend/chatbot reply
     try {
+      // Artificial "typing"/streaming: after a minimum pause, then show typewriter
       const answer = await fetchChatbotResponse(userMsg.text);
-      setMessages((prev) => [
-        ...prev,
-        {
+
+      // Start stream typing effect after a brief artificial "thinking"
+      setTimeout(() => {
+        setShowTyping(false);
+        setPendingBotMessage({
           id: Date.now() + 1,
           sender: "bot",
-          text: answer,
+          text: "",
+          fullText: answer,
           timestamp: new Date().getTime(),
-        },
-      ]);
+        });
+        setStreaming(true);
+      }, 340 + Math.random() * 340);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -126,12 +155,12 @@ function ChatWindow() {
     }
   }
 
-  // Render individual chat message
+  // Render individual chat message (bot/user)
   function renderMessage(msg, idx) {
     const isBot = msg.sender === "bot";
     return (
       <div
-        key={msg.id}
+        key={msg.id + "-" + (msg.text || "").slice(0, 10) + idx}
         className={`chat-message ${isBot ? "bot-message" : "user-message"}`}
         style={{
           alignSelf: isBot ? "flex-start" : "flex-end",
@@ -147,6 +176,7 @@ function ChatWindow() {
           boxShadow: isBot
             ? "0 1px 4px rgba(30,58,138,0.07)"
             : "0 1px 4px rgba(245,158,66,0.10)",
+          whiteSpace: "pre-line",
         }}
       >
         {msg.text}
@@ -154,8 +184,39 @@ function ChatWindow() {
     );
   }
 
+  // Render bot streaming message (not yet in final list)
+  function renderStreamingBot() {
+    if (!pendingBotMessage || !streaming) return null;
+    return (
+      <div
+        className="chat-message bot-message"
+        style={{
+          alignSelf: "flex-start",
+          borderRadius: "13px 13px 13px 5.5px",
+          padding: "9px 14px",
+          marginBottom: 7,
+          maxWidth: "84%",
+          fontSize: "1.03em",
+          fontWeight: 500,
+          letterSpacing: "0.02em",
+          boxShadow: "0 1px 4px rgba(30,58,138,0.07)",
+          minHeight: 22,
+          whiteSpace: "pre-line",
+        }}
+        aria-live="polite"
+      >
+        {pendingBotMessage.text}
+        {pendingBotMessage.text.length < (pendingBotMessage.fullText?.length ?? 0) && (
+          <span className="blinking-cursor" style={{ opacity: 0.6 }}>▋</span>
+        )}
+      </div>
+    );
+  }
+
   // Render loading spinner/message as if bot is "typing"
   function renderLoading() {
+    // Show only if not currently streaming
+    if (!showTyping || streaming) return null;
     return (
       <div
         className="chat-message bot-message"
@@ -168,6 +229,7 @@ function ChatWindow() {
           alignItems: "center",
           fontWeight: 500,
         }}
+        aria-live="polite"
       >
         <span className="dot-flashing" style={{ marginRight: 6 }}>
           <svg width="18px" height="12px" viewBox="0 0 50 12">
@@ -192,7 +254,8 @@ function ChatWindow() {
       <div className="chat-header">Conversation</div>
       <div className="chat-messages" style={{ display: "flex", flexDirection: "column" }}>
         {messages.map(renderMessage)}
-        {loading && renderLoading()}
+        {renderStreamingBot()}
+        {renderLoading()}
         <div ref={messagesEndRef} />
       </div>
       <form className="chat-input-bar" onSubmit={handleSend} autoComplete="off">
@@ -202,26 +265,38 @@ function ChatWindow() {
           placeholder="Type your message..."
           value={input}
           onChange={handleInputChange}
-          disabled={loading}
+          disabled={loading || streaming}
           aria-label="Type your message"
           autoFocus={true}
         />
         <button
           className="chat-send"
           type="submit"
-          disabled={loading || !input.trim()}
+          disabled={loading || streaming || !input.trim()}
           aria-label="Send message"
           style={{
-            cursor: loading || !input.trim() ? "not-allowed" : "pointer",
-            opacity: loading || !input.trim() ? 0.7 : 1,
+            cursor: loading || streaming || !input.trim() ? "not-allowed" : "pointer",
+            opacity: loading || streaming || !input.trim() ? 0.7 : 1,
           }}
         >
-          {loading ? "Sending..." : "Send"}
+          {loading ? "Sending..." : streaming ? "Bot replying..." : "Send"}
         </button>
       </form>
       {error && (
         <div style={{ color: "#d32f2f", margin: "0 16px 6px 16px", fontSize: "0.97em" }}>{error}</div>
       )}
+      <style>{`
+        .blinking-cursor {
+          animation: blink-cursor 1s steps(2, start) infinite;
+          font-weight: bold;
+          font-size: 1em;
+        }
+        @keyframes blink-cursor {
+          0% { opacity: 0.6; }
+          60% { opacity: 0.0; }
+          100% { opacity: 0.6; }
+        }
+      `}</style>
     </section>
   );
 }
