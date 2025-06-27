@@ -8,6 +8,31 @@ import React, { useState, useRef, useEffect } from "react";
  *  - Mocked assistant response with simulated delay for demo purposes.
  *  - Scrolls to newest message automatically.
  */
+/**
+ * Simulate backend chat interaction using dummy async function.
+ * Replace this with a real fetch (e.g., to FastAPI+Neo4j) once endpoint/keys are available.
+ */
+// PUBLIC_INTERFACE
+async function fetchChatbotResponse(userText) {
+  // Simulate async network delay (backend call)
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Demo AI - replace with backend API call integration here (see mockAssistantResponse for logic)
+      if (!userText.trim()) {
+        resolve("Could you please type your question?");
+      } else if (/football|soccer|nba|basketball/i.test(userText)) {
+        resolve("Tonight at 8PM: Lakers vs. Celtics on ESPN. ⚽️🏀");
+      } else if (/guide|today|evening/i.test(userText)) {
+        resolve("Here's today's sports TV guide: 6PM - Baseball on Fox Sports, 8PM - Football on ESPN, 10PM - Tennis on Star Sports.");
+      } else if (/hi|hello|hey|who/i.test(userText)) {
+        resolve("Hello! I'm here to help you find sports TV schedules.");
+      } else {
+        resolve("Sorry, I can't answer that yet. Try asking about TV guide times or a sports match!");
+      }
+    }, 950 + Math.random() * 800);
+  });
+}
+
 // PUBLIC_INTERFACE
 function ChatWindow() {
   // Chat message state
@@ -29,9 +54,10 @@ function ChatWindow() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Simple mock backend "AI" reply
+  // Deprecated: Simple mock backend "AI" reply (for backward compatibility)
   function mockAssistantResponse(userText) {
-    // Add demo logic for variety; in real implementation, replace with API call.
+    // This function is replaced by fetchChatbotResponse (async).
+    // Retained for reference or fallback.
     if (!userText.trim()) {
       return "Could you please type your question?";
     }
@@ -55,7 +81,7 @@ function ChatWindow() {
   }
 
   // PUBLIC_INTERFACE
-  function handleSend(e) {
+  async function handleSend(e) {
     e.preventDefault();
     if (!input.trim()) {
       setError("Please enter a message.");
@@ -73,9 +99,9 @@ function ChatWindow() {
     setInput("");
     setLoading(true);
 
-    // Simulate async backend response with delay
-    setTimeout(() => {
-      const answer = mockAssistantResponse(userMsg.text);
+    // Call the stubbed (dummy) async data fetch function for backend/chatbot reply
+    try {
+      const answer = await fetchChatbotResponse(userMsg.text);
       setMessages((prev) => [
         ...prev,
         {
@@ -85,8 +111,19 @@ function ChatWindow() {
           timestamp: new Date().getTime(),
         },
       ]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          sender: "bot",
+          text: "Error: Failed to reach the chatbot service.",
+          timestamp: new Date().getTime(),
+        },
+      ]);
+    } finally {
       setLoading(false);
-    }, 950 + Math.random() * 800);
+    }
   }
 
   // Render individual chat message

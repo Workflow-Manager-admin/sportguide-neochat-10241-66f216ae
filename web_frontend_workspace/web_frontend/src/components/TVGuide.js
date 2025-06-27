@@ -5,10 +5,14 @@ import React from "react";
  * in a modern, responsive card/table style layout.
  * Uses placeholder/mock data for now.
  */
+/**
+ * Simulate async data fetching for sports TV guide schedule.
+ * Replace this with real Gracenote API/Neo4j integration when endpoints and keys are available.
+ */
 // PUBLIC_INTERFACE
-function TVGuide() {
-  // Mock schedule data
-  const schedule = [
+async function fetchTVGuideData() {
+  // Simulated API example: resolve dummy data after a network-like delay
+  const dummySchedule = [
     {
       id: 1,
       sport: "Football",
@@ -50,6 +54,28 @@ function TVGuide() {
       league: "Premier League",
     },
   ];
+  return new Promise((resolve) => setTimeout(() => resolve(dummySchedule), 650));
+}
+
+// PUBLIC_INTERFACE
+function TVGuide() {
+  // State for schedule data (simulate async data fetching)
+  const [schedule, setSchedule] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let isSubscribed = true;
+    setLoading(true);
+    fetchTVGuideData().then((data) => {
+      if (isSubscribed) {
+        setSchedule(data);
+        setLoading(false);
+      }
+    });
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
 
   return (
     <aside className="tv-guide">
@@ -62,72 +88,80 @@ function TVGuide() {
             padding: "12px 0",
           }}
         >
-          <table
-            style={{
-              borderCollapse: "collapse",
-              width: "100%",
-              minWidth: "350px",
-              background: "none",
-              marginBottom: 0,
-              fontSize: "0.98rem",
-            }}
-          >
-            <thead>
-              <tr style={{ background: "#eff9f1" }}>
-                <th style={thStyle}>Time</th>
-                <th style={thStyle}>Match</th>
-                <th style={thStyle}>League</th>
-                <th style={thStyle}>Channel</th>
-              </tr>
-            </thead>
-            <tbody>
-              {schedule.map((game) => (
-                <tr key={game.id} style={{ borderBottom: "1px solid #e9ecef" }}>
-                  <td style={tdTimeStyle}>{game.time}</td>
-                  <td style={tdStyle}>
-                    <span style={{ fontWeight: 600 }}>{game.match}</span>
-                    <span
-                      style={{
-                        marginLeft: 8,
-                        fontSize: "0.96em",
-                        color: "var(--text-secondary)",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {sportIcon(game.sport)}{" "}
-                      <span style={{ color: "var(--text-primary)", opacity: 0.70 }}>
-                        {game.sport}
-                      </span>
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <span style={{ color: "var(--tv-guide-league-color)", fontWeight: 600 }}>
-                      {game.league}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <span
-                      style={{
-                        background: "var(--chat-bot-bg)",
-                        color: "var(--primary)",
-                        borderRadius: 6,
-                        fontSize: "0.97em",
-                        padding: "2px 10px",
-                        fontWeight: 500,
-                        letterSpacing: "0.01em",
-                        border: "1px solid var(--border-color)",
-                      }}
-                    >
-                      {game.channel}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ marginTop: "0.7em", color: "#b3b3b3", fontSize: "0.97em", textAlign: "center" }}>
-            *All times shown are local timezone.
-          </div>
+          {loading ? (
+            <div style={{ textAlign: "center", color: "#7c72dd", fontWeight: 500, margin: "2.3em 1em 2.3em 1em" }}>
+              Loading schedule...
+            </div>
+          ) : (
+            <>
+              <table
+                style={{
+                  borderCollapse: "collapse",
+                  width: "100%",
+                  minWidth: "350px",
+                  background: "none",
+                  marginBottom: 0,
+                  fontSize: "0.98rem",
+                }}
+              >
+                <thead>
+                  <tr style={{ background: "#eff9f1" }}>
+                    <th style={thStyle}>Time</th>
+                    <th style={thStyle}>Match</th>
+                    <th style={thStyle}>League</th>
+                    <th style={thStyle}>Channel</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedule.map((game) => (
+                    <tr key={game.id} style={{ borderBottom: "1px solid #e9ecef" }}>
+                      <td style={tdTimeStyle}>{game.time}</td>
+                      <td style={tdStyle}>
+                        <span style={{ fontWeight: 600 }}>{game.match}</span>
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            fontSize: "0.96em",
+                            color: "var(--text-secondary)",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {sportIcon(game.sport)}{" "}
+                          <span style={{ color: "var(--text-primary)", opacity: 0.70 }}>
+                            {game.sport}
+                          </span>
+                        </span>
+                      </td>
+                      <td style={tdStyle}>
+                        <span style={{ color: "var(--tv-guide-league-color)", fontWeight: 600 }}>
+                          {game.league}
+                        </span>
+                      </td>
+                      <td style={tdStyle}>
+                        <span
+                          style={{
+                            background: "var(--chat-bot-bg)",
+                            color: "var(--primary)",
+                            borderRadius: 6,
+                            fontSize: "0.97em",
+                            padding: "2px 10px",
+                            fontWeight: 500,
+                            letterSpacing: "0.01em",
+                            border: "1px solid var(--border-color)",
+                          }}
+                        >
+                          {game.channel}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ marginTop: "0.7em", color: "#b3b3b3", fontSize: "0.97em", textAlign: "center" }}>
+                *All times shown are local timezone.
+              </div>
+            </>
+          )}
         </div>
       </div>
     </aside>
