@@ -53,9 +53,16 @@ describe('ChatWindow', () => {
 
     // Bot reply (mocked) should eventually be shown (partial match ok)
     await waitFor(() => {
+      // Custom matcher: look for a message that includes both 'Lakers vs. Celtics' and 'ESPN'
       expect(
-        screen.getByText(/Lakers vs\. Celtics.*ESPN/, { exact: false })
-      ).toBeInTheDocument();
+        screen.getAllByText((content, node) => {
+          const hasText = (node) =>
+            node.textContent &&
+            node.textContent.includes('Lakers vs. Celtics') &&
+            node.textContent.includes('ESPN');
+          return hasText(node);
+        }).length
+      ).toBeGreaterThan(0);
     });
   });
 
