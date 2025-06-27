@@ -52,17 +52,18 @@ describe('ChatWindow', () => {
     advanceTimers(3000); // Ensure async behavior and streaming are completed
 
     // Bot reply (mocked) should eventually be shown (partial match ok)
-    // Wait for the FULL STREAMED message that includes both fragments to appear
+    // Wait for the FULL STREAMED message that includes both fragments to appear, regardless of cursor or markup
     await waitFor(() => {
-      expect(
-        screen.getByText((content, node) => {
-          const text = node && node.textContent;
-          return (
-            text &&
-            text.includes("Tonight at 8PM: Lakers vs. Celtics on ESPN") // Must match full, final bot reply
-          );
-        })
-      ).toBeInTheDocument();
+      // Use a regex and toHaveTextContent for robustness in streamed bots
+      const botMsgs = screen.getAllByText(
+        (_content, node) =>
+          node.className &&
+          node.className.includes('bot-message') &&
+          node.textContent &&
+          /Tonight at 8PM: Lakers vs\. Celtics on ESPN/.test(node.textContent)
+      );
+      expect(botMsgs.length).toBeGreaterThan(0);
+      expect(botMsgs[0]).toHaveTextContent(/Tonight at 8PM: Lakers vs\. Celtics on ESPN/);
     });
   });
 
